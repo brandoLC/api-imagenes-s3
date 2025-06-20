@@ -1,9 +1,9 @@
 org: brandolc18
-service: api-s3
+service: api-imagenes-s3
 
 provider:
   name: aws
-  runtime: python3.13
+  runtime: python3.9
   region: us-east-1
   memorySize: 1024
   timeout: 30

@@ -22,7 +22,18 @@ def lambda_handler(event, context):
             # Crear el bucket
             response = s3.create_bucket(Bucket=nombre_bucket)
             
-            # Configurar el bucket para ser público (para lectura)
+            # PRIMERO: Desbloquear acceso público (necesario antes de aplicar política)
+            s3.put_public_access_block(
+                Bucket=nombre_bucket,
+                PublicAccessBlockConfiguration={
+                    'BlockPublicAcls': True,        # Bloquear ACLs
+                    'IgnorePublicAcls': True,       # Ignorar ACLs
+                    'BlockPublicPolicy': False,     # Permitir políticas públicas
+                    'RestrictPublicBuckets': False  # No restringir buckets públicos
+                }
+            )
+            
+            # SEGUNDO: Configurar política del bucket para lectura pública
             bucket_policy = {
                 "Version": "2012-10-17",
                 "Statement": [
@@ -36,21 +47,10 @@ def lambda_handler(event, context):
                 ]
             }
             
-            # Aplicar la política del bucket
+            # TERCERO: Aplicar la política del bucket
             s3.put_bucket_policy(
                 Bucket=nombre_bucket,
                 Policy=json.dumps(bucket_policy)
-            )
-            
-            # Desbloquear acceso público (solo para política de bucket)
-            s3.put_public_access_block(
-                Bucket=nombre_bucket,
-                PublicAccessBlockConfiguration={
-                    'BlockPublicAcls': True,        # Bloquear ACLs
-                    'IgnorePublicAcls': True,       # Ignorar ACLs
-                    'BlockPublicPolicy': False,     # Permitir políticas públicas
-                    'RestrictPublicBuckets': False  # No restringir buckets públicos
-                }
             )
             
             # Crear directorios base

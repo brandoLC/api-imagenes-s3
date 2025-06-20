@@ -13,6 +13,7 @@ Esta API está diseñada específicamente para gestionar imágenes de productos 
 ## Endpoints Disponibles
 
 ### 1. Crear Bucket para Farmacia
+
 **POST** `/s3/crear-bucket-farmacia`
 
 Crea un bucket específico para imágenes de farmacia con configuración pública.
@@ -27,9 +28,11 @@ Crea un bucket específico para imágenes de farmacia con configuración públic
 ```
 
 ### 2. Subir Imagen de Farmacia ⭐ **PRINCIPAL**
+
 **POST** `/s3/subir-imagen-farmacia`
 
 **Request:**
+
 ```json
 {
   "bucket": "farmacia-imagenes-brandolc18",
@@ -40,6 +43,7 @@ Crea un bucket específico para imágenes de farmacia con configuración públic
 ```
 
 **Response:**
+
 ```json
 {
   "mensaje": "Imagen subida exitosamente",
@@ -56,12 +60,15 @@ Crea un bucket específico para imágenes de farmacia con configuración públic
 ```
 
 ### 3. Listar Buckets
+
 **GET** `/s3/lista-buckets`
 
 ### 4. Listar Objetos del Bucket
+
 **POST** `/s3/bucket/lista-objetos`
 
 **Request:**
+
 ```json
 {
   "bucket": "farmacia-imagenes-brandolc18",
@@ -70,6 +77,7 @@ Crea un bucket específico para imágenes de farmacia con configuración públic
 ```
 
 ### 5. Crear Directorio
+
 **POST** `/s3/crear-directorio`
 
 ## Categorías Disponibles
@@ -94,19 +102,22 @@ Crea un bucket específico para imágenes de farmacia con configuración públic
 // 1. Subir imagen a S3
 const subirImagen = async (archivoImagen) => {
   const base64 = await convertirABase64(archivoImagen);
-  
-  const response = await fetch('https://tu-api-s3.com/s3/subir-imagen-farmacia', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      categoria: 'productos',
-      nombre_archivo: archivoImagen.name,
-      contenido_archivo: base64
-    })
-  });
-  
+
+  const response = await fetch(
+    "https://tu-api-s3.com/s3/subir-imagen-farmacia",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        categoria: "productos",
+        nombre_archivo: archivoImagen.name,
+        contenido_archivo: base64,
+      }),
+    }
+  );
+
   const data = await response.json();
   return data.imagen_url; // Esta URL la guardas en tu base de datos
 };
@@ -115,16 +126,16 @@ const subirImagen = async (archivoImagen) => {
 const crearProducto = async (producto, archivoImagen) => {
   // Primero subir imagen
   const imagenUrl = await subirImagen(archivoImagen);
-  
+
   // Luego crear producto con la URL
   const nuevoProducto = {
     ...producto,
-    imagen: imagenUrl // Campo imagen con URL de S3
+    imagen: imagenUrl, // Campo imagen con URL de S3
   };
-  
-  await fetch('https://tu-api-productos.com/productos', {
-    method: 'POST',
-    body: JSON.stringify(nuevoProducto)
+
+  await fetch("https://tu-api-productos.com/productos", {
+    method: "POST",
+    body: JSON.stringify(nuevoProducto),
   });
 };
 ```

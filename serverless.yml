@@ -1,0 +1,60 @@
+org: brandolc18
+service: api-imagenes-s3
+
+provider:
+  name: aws
+  runtime: python3.12
+  memorySize: 1024
+  timeout: 30
+  iam:
+    role: arn:aws:iam::248056481657:role/LabRole
+
+functions:
+  lista_buckets:
+    handler: lista_buckets.lambda_handler
+    memorySize: 512
+    events:
+      - http:
+          path: /s3/lista-buckets
+          method: get
+          cors: true
+          integration: lambda
+
+  lista_objetos_bucket:
+    handler: lista_objetos_bucket.lambda_handler
+    events:
+      - http:
+          path: /s3/bucket/lista-objetos
+          method: post
+          cors: true
+          integration: lambda
+
+  crear_bucket_farmacia:
+    handler: crear_bucket_farmacia.lambda_handler
+    memorySize: 512
+    events:
+      - http:
+          path: /s3/crear-bucket-farmacia
+          method: post
+          cors: true
+          integration: lambda
+
+  crear_directorio:
+    handler: crear_directorio.lambda_handler
+    memorySize: 512
+    events:
+      - http:
+          path: /s3/crear-directorio
+          method: post
+          cors: true
+          integration: lambda
+
+  subir_imagen_farmacia:
+    handler: subir_imagen_farmacia.lambda_handler
+    memorySize: 1024
+    events:
+      - http:
+          path: /s3/subir-imagen-farmacia
+          method: post
+          cors: true
+          integration: lambda

@@ -1,9 +1,16 @@
-org: brandolc18
-service: api-s3
+orgprovider:
+  name: aws
+  runtime: python3.13
+  region: us-east-1andol# plugins:
+#   - serverless-python-requirements
+
+# custom:
+#   pythonRequirements:
+#     dockerizePip: non-linuxrvice: api-s3
 
 provider:
   name: aws
-  runtime: python3.12
+  runtime: python3.9
   region: us-east-1
   memorySize: 1024
   timeout: 30
@@ -71,4 +78,5 @@ plugins:
 
 custom:
   pythonRequirements:
-    dockerizePip: non-linux
+    dockerizePip: false
+    slim: true

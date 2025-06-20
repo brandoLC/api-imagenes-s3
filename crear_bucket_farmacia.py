@@ -42,14 +42,14 @@ def lambda_handler(event, context):
                 Policy=json.dumps(bucket_policy)
             )
             
-            # Desbloquear acceso público
+            # Desbloquear acceso público (solo para política de bucket)
             s3.put_public_access_block(
                 Bucket=nombre_bucket,
                 PublicAccessBlockConfiguration={
-                    'BlockPublicAcls': False,
-                    'IgnorePublicAcls': False,
-                    'BlockPublicPolicy': False,
-                    'RestrictPublicBuckets': False
+                    'BlockPublicAcls': True,        # Bloquear ACLs
+                    'IgnorePublicAcls': True,       # Ignorar ACLs
+                    'BlockPublicPolicy': False,     # Permitir políticas públicas
+                    'RestrictPublicBuckets': False  # No restringir buckets públicos
                 }
             )
             

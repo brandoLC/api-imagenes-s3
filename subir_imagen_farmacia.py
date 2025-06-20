@@ -73,13 +73,12 @@ def lambda_handler(event, context):
         }
         content_type = content_types.get(extension.lower(), 'image/jpeg')
         
-        # Subir el archivo con ACL público
+        # Subir el archivo (sin ACL, usamos política de bucket)
         response = s3.put_object(
             Bucket=nombre_bucket,
             Key=key,
             Body=contenido_decodificado,
-            ContentType=content_type,
-            ACL='public-read'  # Hace el archivo público
+            ContentType=content_type
         )
         
         # Construir la URL pública

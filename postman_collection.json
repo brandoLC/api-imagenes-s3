@@ -1,0 +1,151 @@
+{
+  "info": {
+    "name": "API Imágenes S3 Farmacia",
+    "description": "Colección para probar la API de imágenes farmacéuticas en S3",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Crear Bucket Farmacia",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"message\": \"Crear bucket específico para farmacia\"\n}"
+        },
+        "url": {
+          "raw": "https://j2yptao3bf.execute-api.us-east-1.amazonaws.com/dev/s3/crear-bucket-farmacia",
+          "protocol": "https",
+          "host": [
+            "j2yptao3bf",
+            "execute-api",
+            "us-east-1",
+            "amazonaws",
+            "com"
+          ],
+          "path": ["dev", "s3", "crear-bucket-farmacia"]
+        },
+        "description": "Crea el bucket principal para imágenes de farmacia con configuración pública"
+      }
+    },
+    {
+      "name": "2. ⭐ Subir Imagen Farmacia (PRINCIPAL)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"bucket\": \"farmacia-imagenes-brandolc18\",\n  \"categoria\": \"productos\",\n  \"nombre_archivo\": \"paracetamol.jpg\",\n  \"contenido_archivo\": \"/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQH/2wBDAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQH/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwA/8A\"\n}"
+        },
+        "url": {
+          "raw": "https://j2yptao3bf.execute-api.us-east-1.amazonaws.com/dev/s3/subir-imagen-farmacia",
+          "protocol": "https",
+          "host": [
+            "j2yptao3bf",
+            "execute-api",
+            "us-east-1",
+            "amazonaws",
+            "com"
+          ],
+          "path": ["dev", "s3", "subir-imagen-farmacia"]
+        },
+        "description": "🎯 FUNCIÓN PRINCIPAL: Sube una imagen y devuelve la URL pública para usar en tu API de productos"
+      }
+    },
+    {
+      "name": "3. Listar Buckets",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://j2yptao3bf.execute-api.us-east-1.amazonaws.com/dev/s3/lista-buckets",
+          "protocol": "https",
+          "host": [
+            "j2yptao3bf",
+            "execute-api",
+            "us-east-1",
+            "amazonaws",
+            "com"
+          ],
+          "path": ["dev", "s3", "lista-buckets"]
+        },
+        "description": "Lista todos los buckets de S3 disponibles"
+      }
+    },
+    {
+      "name": "4. Listar Objetos del Bucket",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"bucket\": \"farmacia-imagenes-brandolc18\",\n  \"prefijo\": \"productos/\"\n}"
+        },
+        "url": {
+          "raw": "https://j2yptao3bf.execute-api.us-east-1.amazonaws.com/dev/s3/bucket/lista-objetos",
+          "protocol": "https",
+          "host": [
+            "j2yptao3bf",
+            "execute-api",
+            "us-east-1",
+            "amazonaws",
+            "com"
+          ],
+          "path": ["dev", "s3", "bucket", "lista-objetos"]
+        },
+        "description": "Lista las imágenes subidas con sus URLs públicas"
+      }
+    },
+    {
+      "name": "5. Crear Directorio",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"bucket\": \"farmacia-imagenes-brandolc18\",\n  \"directorio\": \"nuevos-productos\"\n}"
+        },
+        "url": {
+          "raw": "https://j2yptao3bf.execute-api.us-east-1.amazonaws.com/dev/s3/crear-directorio",
+          "protocol": "https",
+          "host": [
+            "j2yptao3bf",
+            "execute-api",
+            "us-east-1",
+            "amazonaws",
+            "com"
+          ],
+          "path": ["dev", "s3", "crear-directorio"]
+        },
+        "description": "Crea nuevas categorías/directorios en el bucket"
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://j2yptao3bf.execute-api.us-east-1.amazonaws.com/dev"
+    }
+  ]
+}

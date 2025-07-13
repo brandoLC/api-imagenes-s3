@@ -3,7 +3,7 @@
 ## Base URL
 
 ```
-https://j2yptao3bf.execute-api.us-east-1.amazonaws.com/dev
+https://7nwcu4oguc.execute-api.us-east-1.amazonaws.com/dev
 ```
 
 ## 1. 🏗️ Crear Bucket Farmacia

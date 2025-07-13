@@ -16,7 +16,7 @@ def lambda_handler(event, context):
             body = event.get('body', {})
         
         # Parámetros de entrada
-        nombre_bucket = body.get('bucket', 'farmacia-imagenes-brandolc18')
+        nombre_bucket = body.get('bucket', 'farmacia-imagenes-brandolc18-1752374246')
         categoria = body.get('categoria', 'productos')  # productos, medicamentos, promociones
         nombre_archivo = body.get('nombre_archivo')
         contenido_archivo = body.get('contenido_archivo')  # Base64 encoded
@@ -45,6 +45,48 @@ def lambda_handler(event, context):
         
         # Proceso
         s3 = boto3.client('s3')
+        
+        # Verificar si el bucket existe y tenemos permisos, si no, crear uno nuevo
+        try:
+            # Intentar verificar que podemos escribir en el bucket
+            s3.head_bucket(Bucket=nombre_bucket)
+        except Exception as bucket_error:
+            # Si no podemos acceder, crear un bucket con timestamp único
+            import time
+            timestamp_bucket = str(int(time.time()))
+            nombre_bucket = f"farmacia-imagenes-brandolc18-{timestamp_bucket}"
+            
+            # Crear el bucket
+            s3.create_bucket(Bucket=nombre_bucket)
+            
+            # Configurar acceso público
+            s3.put_public_access_block(
+                Bucket=nombre_bucket,
+                PublicAccessBlockConfiguration={
+                    'BlockPublicAcls': True,
+                    'IgnorePublicAcls': True, 
+                    'BlockPublicPolicy': False,
+                    'RestrictPublicBuckets': False
+                }
+            )
+            
+            # Aplicar política de bucket público
+            bucket_policy = {
+                "Version": "2012-10-17",
+                "Statement": [
+                    {
+                        "Sid": "PublicReadGetObject",
+                        "Effect": "Allow",
+                        "Principal": "*",
+                        "Action": "s3:GetObject",
+                        "Resource": f"arn:aws:s3:::{nombre_bucket}/*"
+                    }
+                ]
+            }
+            s3.put_bucket_policy(
+                Bucket=nombre_bucket,
+                Policy=json.dumps(bucket_policy)
+            )
         
         # Decodificar el contenido del archivo desde base64
         try:

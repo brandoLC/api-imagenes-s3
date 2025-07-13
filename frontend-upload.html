@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🏥 Subir Imágenes Farmacia - S3</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+
+      .container {
+        background: white;
+        padding: 40px;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+        max-width: 600px;
+        width: 100%;
+      }
+
+      h1 {
+        text-align: center;
+        color: #333;
+        margin-bottom: 30px;
+        font-size: 2rem;
+      }
+
+      .upload-area {
+        border: 3px dashed #007bff;
+        border-radius: 15px;
+        padding: 60px 20px;
+        text-align: center;
+        background: #f8f9ff;
+        margin-bottom: 30px;
+        transition: all 0.3s ease;
+        cursor: pointer;
+      }
+
+      .upload-area.dragover {
+        border-color: #28a745;
+        background: #f0fff4;
+        transform: scale(1.02);
+      }
+
+      .upload-area:hover {
+        border-color: #28a745;
+        background: #f0fff4;
+      }
+
+      .upload-icon {
+        font-size: 4rem;
+        color: #007bff;
+        margin-bottom: 20px;
+      }
+
+      .upload-text {
+        font-size: 1.2rem;
+        color: #666;
+        margin-bottom: 15px;
+      }
+
+      .upload-hint {
+        color: #999;
+        font-size: 0.9rem;
+      }
+
+      .file-input {
+        display: none;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #333;
+      }
+
+      select,
+      input[type="text"] {
+        width: 100%;
+        padding: 12px;
+        border: 2px solid #e1e5e9;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: border-color 0.3s ease;
+      }
+
+      select:focus,
+      input[type="text"]:focus {
+        outline: none;
+        border-color: #007bff;
+      }
+
+      .upload-btn {
+        width: 100%;
+        padding: 15px;
+        background: linear-gradient(135deg, #007bff, #0056b3);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-bottom: 20px;
+      }
+
+      .upload-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 123, 255, 0.3);
+      }
+
+      .upload-btn:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      .result-area {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 20px;
+        margin-top: 20px;
+        display: none;
+      }
+
+      .result-title {
+        font-weight: 600;
+        color: #28a745;
+        margin-bottom: 15px;
+        font-size: 1.1rem;
+      }
+
+      .url-display {
+        background: white;
+        padding: 15px;
+        border-radius: 8px;
+        border: 2px solid #e9ecef;
+        word-break: break-all;
+        font-family: monospace;
+        margin-bottom: 15px;
+        position: relative;
+      }
+
+      .copy-btn {
+        background: #28a745;
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        transition: background 0.3s ease;
+      }
+
+      .copy-btn:hover {
+        background: #218838;
+      }
+
+      .preview-image {
+        max-width: 100%;
+        max-height: 200px;
+        border-radius: 10px;
+        margin-top: 15px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      .loading {
+        display: none;
+        text-align: center;
+        color: #007bff;
+        font-weight: 600;
+        margin: 20px 0;
+      }
+
+      .spinner {
+        border: 3px solid #f3f3f3;
+        border-top: 3px solid #007bff;
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 10px;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .error {
+        background: #f8d7da;
+        color: #721c24;
+        padding: 15px;
+        border-radius: 8px;
+        margin-top: 15px;
+        display: none;
+      }
+
+      .success {
+        background: #d4edda;
+        color: #155724;
+        padding: 15px;
+        border-radius: 8px;
+        margin-top: 15px;
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🏥 Subir Imágenes Farmacia</h1>
+
+      <div class="upload-area" id="uploadArea">
+        <div class="upload-icon">📁</div>
+        <div class="upload-text">Arrastra tu imagen aquí</div>
+        <div class="upload-hint">o haz clic para seleccionar</div>
+        <input type="file" id="fileInput" class="file-input" accept="image/*" />
+      </div>
+
+      <div class="form-group">
+        <label for="categoria">Categoría:</label>
+        <select id="categoria">
+          <option value="productos">🧴 Productos</option>
+          <option value="medicamentos">💊 Medicamentos</option>
+          <option value="promociones">🎯 Promociones</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="nombreArchivo">Nombre del archivo (opcional):</label>
+        <input
+          type="text"
+          id="nombreArchivo"
+          placeholder="Ej: paracetamol.jpg"
+        />
+      </div>
+
+      <button class="upload-btn" id="uploadBtn" disabled>
+        📤 Subir Imagen
+      </button>
+
+      <div class="loading" id="loading">
+        <div class="spinner"></div>
+        Subiendo imagen...
+      </div>
+
+      <div class="error" id="error"></div>
+      <div class="success" id="success"></div>
+
+      <div class="result-area" id="resultArea">
+        <div class="result-title">✅ ¡Imagen subida exitosamente!</div>
+        <div class="url-display" id="urlDisplay"></div>
+        <button class="copy-btn" id="copyBtn">📋 Copiar URL</button>
+        <img id="previewImage" class="preview-image" style="display: none" />
+      </div>
+    </div>
+
+    <script>
+      // Configuración de la API
+      const API_BASE_URL =
+        "https://widxi4kx6i.execute-api.us-east-1.amazonaws.com/dev";
+
+      // Elementos DOM
+      const uploadArea = document.getElementById("uploadArea");
+      const fileInput = document.getElementById("fileInput");
+      const uploadBtn = document.getElementById("uploadBtn");
+      const categoria = document.getElementById("categoria");
+      const nombreArchivo = document.getElementById("nombreArchivo");
+      const loading = document.getElementById("loading");
+      const error = document.getElementById("error");
+      const success = document.getElementById("success");
+      const resultArea = document.getElementById("resultArea");
+      const urlDisplay = document.getElementById("urlDisplay");
+      const copyBtn = document.getElementById("copyBtn");
+      const previewImage = document.getElementById("previewImage");
+
+      let selectedFile = null;
+
+      // Event listeners para drag & drop
+      uploadArea.addEventListener("click", () => fileInput.click());
+      uploadArea.addEventListener("dragover", handleDragOver);
+      uploadArea.addEventListener("dragleave", handleDragLeave);
+      uploadArea.addEventListener("drop", handleDrop);
+      fileInput.addEventListener("change", handleFileSelect);
+      uploadBtn.addEventListener("click", uploadImage);
+      copyBtn.addEventListener("click", copyUrl);
+
+      function handleDragOver(e) {
+        e.preventDefault();
+        uploadArea.classList.add("dragover");
+      }
+
+      function handleDragLeave(e) {
+        e.preventDefault();
+        uploadArea.classList.remove("dragover");
+      }
+
+      function handleDrop(e) {
+        e.preventDefault();
+        uploadArea.classList.remove("dragover");
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+          handleFile(files[0]);
+        }
+      }
+
+      function handleFileSelect(e) {
+        const file = e.target.files[0];
+        if (file) {
+          handleFile(file);
+        }
+      }
+
+      function handleFile(file) {
+        // Validar que sea imagen
+        if (!file.type.startsWith("image/")) {
+          showError("Por favor selecciona un archivo de imagen válido.");
+          return;
+        }
+
+        // Validar tamaño (máximo 5MB)
+        if (file.size > 5 * 1024 * 1024) {
+          showError("El archivo es demasiado grande. Máximo 5MB.");
+          return;
+        }
+
+        selectedFile = file;
+        uploadBtn.disabled = false;
+
+        // Auto-completar nombre del archivo si está vacío
+        if (!nombreArchivo.value) {
+          nombreArchivo.value = file.name;
+        }
+
+        // Mostrar preview
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          previewImage.src = e.target.result;
+          previewImage.style.display = "block";
+        };
+        reader.readAsDataURL(file);
+
+        // Actualizar UI
+        uploadArea.innerHTML = `
+                <div class="upload-icon">✅</div>
+                <div class="upload-text">Archivo seleccionado: ${file.name}</div>
+                <div class="upload-hint">Haz clic para cambiar</div>
+            `;
+
+        hideMessages();
+      }
+
+      async function uploadImage() {
+        if (!selectedFile) {
+          showError("Por favor selecciona una imagen.");
+          return;
+        }
+
+        try {
+          uploadBtn.disabled = true;
+          loading.style.display = "block";
+          hideMessages();
+
+          // Convertir a Base64
+          const base64 = await fileToBase64(selectedFile);
+
+          // Preparar datos
+          const requestData = {
+            categoria: categoria.value,
+            nombre_archivo: nombreArchivo.value || selectedFile.name,
+            contenido_archivo: base64,
+          };
+
+          // Hacer request a la API
+          const response = await fetch(
+            `${API_BASE_URL}/s3/subir-imagen-farmacia`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(requestData),
+            }
+          );
+
+          const data = await response.json();
+
+          if (response.ok) {
+            // Éxito
+            const responseData =
+              typeof data.body === "string" ? JSON.parse(data.body) : data;
+            showSuccess("¡Imagen subida exitosamente!");
+            showResult(responseData.imagen_url);
+          } else {
+            // Error
+            const errorData =
+              typeof data.body === "string" ? JSON.parse(data.body) : data;
+            showError(errorData.mensaje || "Error al subir la imagen");
+          }
+        } catch (err) {
+          console.error("Error:", err);
+          showError("Error de conexión. Verifica tu internet.");
+        } finally {
+          loading.style.display = "none";
+          uploadBtn.disabled = false;
+        }
+      }
+
+      function fileToBase64(file) {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => {
+            // Remover el prefijo "data:image/...;base64,"
+            const base64 = reader.result.split(",")[1];
+            resolve(base64);
+          };
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+      }
+
+      function showResult(url) {
+        urlDisplay.textContent = url;
+        resultArea.style.display = "block";
+
+        // Scroll hacia el resultado
+        resultArea.scrollIntoView({ behavior: "smooth" });
+      }
+
+      function copyUrl() {
+        navigator.clipboard.writeText(urlDisplay.textContent).then(() => {
+          copyBtn.textContent = "✅ Copiado!";
+          setTimeout(() => {
+            copyBtn.textContent = "📋 Copiar URL";
+          }, 2000);
+        });
+      }
+
+      function showError(message) {
+        error.textContent = message;
+        error.style.display = "block";
+        success.style.display = "none";
+      }
+
+      function showSuccess(message) {
+        success.textContent = message;
+        success.style.display = "block";
+        error.style.display = "none";
+      }
+
+      function hideMessages() {
+        error.style.display = "none";
+        success.style.display = "none";
+      }
+    </script>
+  </body>
+</html>
